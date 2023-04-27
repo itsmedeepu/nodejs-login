@@ -1,37 +1,34 @@
 const express = require("express");
-const router = express.Router();
 const path = require("path");
+const router = express.Router();
 
-const authLogin = (req, res, next) => {
-  if (req.body.username === "deeksha" && req.body.password === "raj") {
-    req.session.username = "deeksha";
-    req.session.password = "raj";
-  }
-  if (req.session.username !== undefined) {
-    next();
-  } else {
-    res.redirect("login");
-  }
-};
-router.get("/", (req, res) => {
-  res.send("im home page");
-});
+const {
+  logincontroller,
+  authFunctin,
+  dashboardcontroller,
+  logoutController,
+  userRegister,
+  registerPage,
+} = require("../controller/userController");
+const { adminauth } = require("../controller/adminController");
+
 router.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "user", "login.html"));
 });
 
-router.post("/login", authLogin, (req, res) => {
-  res.redirect("dashboard");
+router.post("/login", logincontroller);
+
+router.get("/dashboard", authFunctin, dashboardcontroller);
+
+router.get("/logout", logoutController);
+
+router.get("/", (req, res) => {
+  res.send(`Home page of user route`);
+  console.log("im home route");
 });
 
-router.get("/dashboard", authLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "user", "dashboard.html"));
-});
+router.get("/register", registerPage);
 
-router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    res.redirect("login");
-  });
-});
+router.post("/register", userRegister);
 
 module.exports = router;
